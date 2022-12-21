@@ -1,0 +1,44 @@
+[20:30:16.163] [INFO   ] thread main starting.
+[20:30:16.169] [SEVERE ] cannot read configuration file config.properties trying from resources.
+[20:30:16.171] [SEVERE ] configuration file was loaded from resources directory.
+[20:30:16.710] [INFO   ] thread dealer starting.
+[20:30:16.711] [INFO   ] Thread dealer starting.
+[20:30:16.824] [SEVERE ] placing card 78 in slot 0
+[20:30:16.937] [SEVERE ] placing card 44 in slot 1
+[20:30:17.048] [SEVERE ] placing card 69 in slot 2
+[20:30:17.158] [SEVERE ] placing card 31 in slot 3
+[20:30:17.266] [SEVERE ] placing card 43 in slot 4
+[20:30:17.375] [SEVERE ] placing card 30 in slot 5
+[20:30:17.484] [SEVERE ] placing card 36 in slot 6
+[20:30:17.594] [SEVERE ] placing card 48 in slot 7
+[20:30:17.703] [SEVERE ] placing card 27 in slot 8
+[20:30:17.813] [SEVERE ] placing card 74 in slot 9
+[20:30:17.863] [SEVERE ] key 73 was pressed by player 2
+[20:30:17.921] [SEVERE ] placing card 51 in slot 10
+[20:30:18.029] [SEVERE ] placing card 37 in slot 11
+[20:30:18.029] [INFO   ] Thread dealer starting.
+[20:30:18.993] [SEVERE ] key 73 was pressed by player 2
+[20:30:20.410] [SEVERE ] key 73 was pressed by player 2
+[20:30:20.782] [SEVERE ] key 85 was pressed by player 2
+[20:30:21.457] [SEVERE ] key 87 was pressed by player 1
+[20:30:21.457] [SEVERE ] player 1 placing token on slot 1
+[20:30:22.401] [SEVERE ] key 69 was pressed by player 1
+[20:30:22.402] [SEVERE ] player 1 placing token on slot 2
+[20:30:23.267] [SEVERE ] key 73 was pressed by player 2
+[20:30:23.480] [SEVERE ] key 73 was pressed by player 2
+[20:30:23.729] [SEVERE ] key 73 was pressed by player 2
+[20:30:24.044] [SEVERE ] key 73 was pressed by player 2
+[20:30:24.494] [SEVERE ] key 73 was pressed by player 2
+[20:30:24.663] [SEVERE ] key 73 was pressed by player 2
+[20:30:25.022] [SEVERE ] key 73 was pressed by player 2
+[20:30:25.214] [SEVERE ] key 73 was pressed by player 2
+[20:30:25.619] [SEVERE ] key 85 was pressed by player 2
+[20:30:25.799] [SEVERE ] key 73 was pressed by player 2
+[20:30:25.934] [SEVERE ] key 85 was pressed by player 2
+[20:30:26.091] [SEVERE ] key 73 was pressed by player 2
+[20:30:26.172] [SEVERE ] key 85 was pressed by player 2
+[20:30:26.283] [SEVERE ] key 73 was pressed by player 2
+[20:30:26.991] [SEVERE ] key 73 was pressed by player 2
+[20:30:27.172] [SEVERE ] key 73 was pressed by player 2
+[20:30:27.352] [SEVERE ] key 85 was pressed by player 2
+[20:30:27.532] [SEVERE ] key 73 was pressed by player 2

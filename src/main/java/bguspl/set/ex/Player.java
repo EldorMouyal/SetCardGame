@@ -91,14 +91,17 @@ public class Player implements Runnable {
                     if (!actionsTodo.isEmpty()) {
                         Integer slot = actionsTodo.remove();
                         if (!table.removeToken(this.id, slot)) {
-                            env.ui.placeToken(this.id, slot);
-                            table.placeToken(this.id, slot);
-                            tokensPlaced++;
-                            if (tokensPlaced == 3) {
-                                if (this.dealer.CheckPlayerSet(this.id)) {
-                                    point();
-                                } else
-                                    penalty();
+                            if(tokensPlaced < 3) {
+                                env.ui.placeToken(this.id, slot);
+                                table.placeToken(this.id, slot);
+                                tokensPlaced++;
+
+                                if (tokensPlaced == 3) {
+                                    if (this.dealer.CheckPlayerSet(this.id))
+                                        point();
+                                    else
+                                        penalty();
+                                }
                             }
                         } else {
                             tokensPlaced--;
@@ -157,7 +160,7 @@ public class Player implements Runnable {
      */
     public void keyPressed(int slot) {
         // TODO implement
-        actionsTodo.add(slot);
+            actionsTodo.add(slot);
     }
 
     /**
@@ -168,6 +171,7 @@ public class Player implements Runnable {
      */
     public void point() {
         // TODO implement
+        //System.out.println("yes yes yes");
 
         int ignored = table.countCards(); // this part is just for demonstration in the unit tests
         env.ui.setScore(id, ++score);
@@ -178,6 +182,14 @@ public class Player implements Runnable {
      */
     public void penalty() {
         // TODO implement
+        //System.out.println("no no no");
+        //try {
+            //env.ui.setFreeze(this.id,env.config.penaltyFreezeMillis);
+            //Thread.sleep(env.config.penaltyFreezeMillis);
+            actionsTodo.clear();
+            //env.ui.setFreeze(this.id,0);
+        //} catch (InterruptedException e) {
+        //}
     }
 
     public int score() {

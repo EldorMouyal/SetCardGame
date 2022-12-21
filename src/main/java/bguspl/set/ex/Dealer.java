@@ -1,11 +1,13 @@
 package bguspl.set.ex;
 
 import bguspl.set.Env;
+import bguspl.set.ThreadLogger;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -56,7 +58,9 @@ public class Dealer implements Runnable {
         while (!shouldFinish()) {
             placeCardsOnTable();
             for (Player p: players) {
-                p.run();}
+                Thread t = new Thread(p);
+                t.start();
+            }
             timerLoop();
             updateTimerDisplay(false);
             removeAllCardsFromTable();
@@ -118,6 +122,11 @@ public class Dealer implements Runnable {
      */
     private void sleepUntilWokenOrTimeout() {
         // TODO implement
+        try {
+            Thread.sleep(env.config.tableDelayMillis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -125,6 +134,8 @@ public class Dealer implements Runnable {
      */
     private void updateTimerDisplay(boolean reset) {
         // TODO implement
+        if(reset)
+            env.ui.setCountdown(env.config.turnTimeoutMillis,false);
     }
 
     /**
@@ -140,9 +151,25 @@ public class Dealer implements Runnable {
     private void announceWinners() {
         // TODO implement
     }
-    public boolean CheckPlayerSet(int PlayerId)
+    public boolean CheckPlayerSet(int playerId)
     {
-        int[] PlayerCards= table.GetPlayerCards(PlayerId);
-       return env.util.testSet(PlayerCards);
+        int[] PlayerCards= table.GetPlayerCards(playerId);
+        boolean isSet =  env.util.testSet(PlayerCards);
+        if(isSet){
+
+        }
+        else{
+            //env.ui.setFreeze(playerId,env.config.penaltyFreezeMillis);
+            try {
+                long d = env.config.penaltyFreezeMillis ;
+                while (d > 0){
+                    env.ui.setFreeze(playerId,d);
+                    Thread.sleep(1000);
+                    d = d - 1000;
+                }
+                env.ui.setFreeze(playerId,d);
+            } catch (InterruptedException e) {}
+        }
+        return isSet;
     }
 }

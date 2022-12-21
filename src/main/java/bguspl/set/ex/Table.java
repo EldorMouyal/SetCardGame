@@ -127,7 +127,6 @@ public class Table {
     public synchronized void placeToken(int player, int slot) {
         // TODO implement
         tokensToSlot[slot].add(player);
-
     }
 
     /**
@@ -138,7 +137,6 @@ public class Table {
      */
     public synchronized boolean removeToken(int player, int slot) {
         // TODO implement
-
         for (int i=0; i<tokensToSlot[slot].size();i++)
         {
             if (tokensToSlot[slot].get(i)==player) {

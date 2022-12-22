@@ -58,6 +58,7 @@ public class Dealer implements Runnable {
             Thread t = new Thread(p);
             t.start();
         }
+        doesNum2HasChance();
         while (!shouldFinish()) {
 
             placeCardsOnTable();
@@ -66,10 +67,10 @@ public class Dealer implements Runnable {
             removeAllCardsFromTable();
 
         }
-
-
+        //if the game is finished then wi announce winners.
         announceWinners();
         env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
+        terminate();
     }
 
     /**
@@ -109,19 +110,22 @@ public class Dealer implements Runnable {
         {
             if (!cardsToRemove.isEmpty()) {
 
-                int[] ToRemove = cardsToRemove.getFirst();
-                cardsToRemove.removeFirst();
-                int[] slots = new int[3];
-                for (int i = 0; i < 3; i++) {
-                    slots[i] = table.cardToSlot[ToRemove[i]];
-                    for (Player p:players) {
-                        table.removeCard(slots[i]);
-                        table.removeToken(p.id,slots[i]);
+                synchronized (table) {//avoiding letting a player to place tokens while no cards on table
+                    int[] ToRemove = cardsToRemove.getFirst();//making an array of the first set that need to get removed
+                    cardsToRemove.removeFirst();
+                    int[] slots = new int[3];
+                    for (int i = 0; i < 3; i++) {//removing the set and its tokens
+                        slots[i] = table.cardToSlot[ToRemove[i]];
+                        for (Player p : players) {
+                            table.removeCard(slots[i]);
+                            table.removeToken(p.id, slots[i]);
+                        }
+
                     }
+                    placeCardsOnTable();//placing new cards on table
 
                 }
             }
-            placeCardsOnTable();
         }
     }
 
@@ -169,10 +173,17 @@ public class Dealer implements Runnable {
     /**
      * Check who is/are the winner/s and displays them.
      */
-    private void announceWinners() {
+    private synchronized void announceWinners() {
         // TODO implement
+        int[] playerIds= new int[players.length];
+        int i=0;
+        for(Player p:players)
+        {
+            playerIds[i]=p.id;
+        }
+        env.ui.announceWinner(playerIds);
     }
-    public boolean CheckPlayerSet(int playerId)//this methods cheks if a player has a set and calles the appropriate freeze methode
+    public boolean CheckPlayerSet(int playerId)//this methods checks if a player has a set and calls the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
         boolean isSet =  env.util.testSet(PlayerCards);
@@ -215,5 +226,34 @@ public class Dealer implements Runnable {
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}
+    }
+
+    public void doesNum2HasChance()//check if there is still a possibillity for #2 player to get the 1# places
+    {
+        int score1=0;
+        int score2=0;
+        for (int i=0; i< players.length;i++)
+        {
+            if (players[i].score()>score1)
+            {
+                score2=score1;
+                score1=players[i].score();
+            }
+            else
+            {
+                if (players[i].score()>score2)
+                {
+                    score2=players[i].score();
+                }
+            }
+        }
+
+        int difference=env.util.findSets(deck, score1-score2).size();
+
+        if (difference<score1-score2)
+        {
+            terminate=true;
+        }
+
     }
 }

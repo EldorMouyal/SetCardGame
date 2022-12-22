@@ -127,7 +127,7 @@ public class Table {
      * @param player - the player the token belongs to.
      * @param slot   - the slot on which to place the token.
      */
-    public  void placeToken(int player, int slot) {
+    public void placeToken(int player, int slot) {
         // TODO implement
         if (slotToCard[slot]!= null)
             tokensToSlot[slot].add(player);

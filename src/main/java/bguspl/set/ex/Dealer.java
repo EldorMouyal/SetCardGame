@@ -109,19 +109,22 @@ public class Dealer implements Runnable {
         {
             if (!cardsToRemove.isEmpty()) {
 
-                int[] ToRemove = cardsToRemove.getFirst();
-                cardsToRemove.removeFirst();
-                int[] slots = new int[3];
-                for (int i = 0; i < 3; i++) {
-                    slots[i] = table.cardToSlot[ToRemove[i]];
-                    for (Player p:players) {
-                        table.removeCard(slots[i]);
-                        table.removeToken(p.id,slots[i]);
+                synchronized (table) {
+                    int[] ToRemove = cardsToRemove.getFirst();
+                    cardsToRemove.removeFirst();
+                    int[] slots = new int[3];
+                    for (int i = 0; i < 3; i++) {
+                        slots[i] = table.cardToSlot[ToRemove[i]];
+                        for (Player p : players) {
+                            table.removeCard(slots[i]);
+                            table.removeToken(p.id, slots[i]);
+                        }
+
                     }
+                    placeCardsOnTable();
 
                 }
             }
-            placeCardsOnTable();
         }
     }
 

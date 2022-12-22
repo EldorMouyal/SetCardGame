@@ -90,6 +90,7 @@ public class Dealer implements Runnable {
      */
     public void terminate() {
         // TODO implement
+
     }
 
     /**
@@ -119,6 +120,7 @@ public class Dealer implements Runnable {
                         for (Player p : players) {
                             table.removeCard(slots[i]);
                             table.removeToken(p.id, slots[i]);
+                            p.decreaseTokens();
                         }
 
                     }
@@ -203,7 +205,7 @@ public class Dealer implements Runnable {
         return isSet;
     }
 
-    public void FreezePlayerForPenalty(int playerId)
+    private void FreezePlayerForPenalty(int playerId)
     {
         try {
             long d = env.config.penaltyFreezeMillis ;
@@ -215,7 +217,7 @@ public class Dealer implements Runnable {
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}
     }
-    public void FreezePlayerForPoint(int playerId)
+    private void FreezePlayerForPoint(int playerId)
     {
         try {
             long d = env.config.pointFreezeMillis ;

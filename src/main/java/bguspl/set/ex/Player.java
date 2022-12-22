@@ -191,4 +191,9 @@ public class Player implements Runnable {
     public int score() {
         return score;
     }
+    public void decreaseTokens()
+    {
+        if (tokensPlaced>0)
+            tokensPlaced--;
+    }
 }

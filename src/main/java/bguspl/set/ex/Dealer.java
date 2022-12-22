@@ -151,25 +151,42 @@ public class Dealer implements Runnable {
     private void announceWinners() {
         // TODO implement
     }
-    public boolean CheckPlayerSet(int playerId)
+    public boolean CheckPlayerSet(int playerId)//this methods cheks if a player has a set and calles the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
         boolean isSet =  env.util.testSet(PlayerCards);
         if(isSet){
-
+            FreezePlayerForPoint(playerId);
         }
         else{
             //env.ui.setFreeze(playerId,env.config.penaltyFreezeMillis);
-            try {
-                long d = env.config.penaltyFreezeMillis ;
-                while (d > 0){
-                    env.ui.setFreeze(playerId,d);
-                    Thread.sleep(1000);
-                    d = d - 1000;
-                }
-                env.ui.setFreeze(playerId,d);
-            } catch (InterruptedException e) {}
-        }
+      FreezePlayerForPenalty(playerId);
+          }
         return isSet;
+    }
+
+    public void FreezePlayerForPenalty(int playerId)
+    {
+        try {
+            long d = env.config.penaltyFreezeMillis ;
+            while (d > 0){
+                env.ui.setFreeze(playerId,d);
+                Thread.sleep(1000);
+                d = d - 1000;
+            }
+            env.ui.setFreeze(playerId,d);
+        } catch (InterruptedException e) {}
+    }
+    public void FreezePlayerForPoint(int playerId)
+    {
+        try {
+            long d = env.config.pointFreezeMillis ;
+            while (d > 0){
+                env.ui.setFreeze(playerId,d);
+                Thread.sleep(1000);
+                d = d - 1000;
+            }
+            env.ui.setFreeze(playerId,d);
+        } catch (InterruptedException e) {}
     }
 }

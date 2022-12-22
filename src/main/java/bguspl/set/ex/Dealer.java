@@ -117,6 +117,7 @@ public class Dealer implements Runnable {
                     for (Player p:players) {
                         table.removeCard(slots[i]);
                         table.removeToken(p.id,slots[i]);
+                        placeCardsOnTable();
 
                     }
                 }
@@ -175,10 +176,10 @@ public class Dealer implements Runnable {
     public boolean CheckPlayerSet(int playerId)//this methods cheks if a player has a set and calles the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
-        cardsToRemove.add(PlayerCards);
         boolean isSet =  env.util.testSet(PlayerCards);
         if(isSet){
             FreezePlayerForPoint(playerId);
+            cardsToRemove.add(PlayerCards);
         }
         else{
             //env.ui.setFreeze(playerId,env.config.penaltyFreezeMillis);

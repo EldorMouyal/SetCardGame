@@ -1,0 +1,27 @@
+[12:08:43.922] [INFO   ] thread main starting.
+[12:08:43.929] [SEVERE ] cannot read configuration file config.properties trying from resources.
+[12:08:43.931] [SEVERE ] configuration file was loaded from resources directory.
+[12:08:44.336] [INFO   ] thread dealer starting.
+[12:08:44.337] [INFO   ] Thread dealer starting.
+[12:08:44.337] [INFO   ] Thread Thread-0 starting.
+[12:08:44.449] [SEVERE ] placing card 67 in slot 0
+[12:08:44.560] [SEVERE ] placing card 76 in slot 1
+[12:08:44.670] [SEVERE ] placing card 68 in slot 2
+[12:08:44.782] [SEVERE ] placing card 15 in slot 3
+[12:08:44.892] [SEVERE ] placing card 69 in slot 4
+[12:08:45.003] [SEVERE ] placing card 39 in slot 5
+[12:08:45.114] [SEVERE ] placing card 8 in slot 6
+[12:08:45.225] [SEVERE ] placing card 31 in slot 7
+[12:08:45.337] [SEVERE ] placing card 19 in slot 8
+[12:08:45.448] [SEVERE ] placing card 34 in slot 9
+[12:08:45.504] [SEVERE ] key 79 was pressed by player 2
+[12:08:45.559] [SEVERE ] placing card 30 in slot 10
+[12:08:45.670] [SEVERE ] placing card 75 in slot 11
+[12:08:45.957] [SEVERE ] key 73 was pressed by player 2
+[12:08:46.305] [SEVERE ] key 85 was pressed by player 2
+[12:08:46.416] [SEVERE ] key 73 was pressed by player 2
+[12:08:46.564] [SEVERE ] key 85 was pressed by player 2
+[12:08:46.630] [SEVERE ] key 73 was pressed by player 2
+[12:08:47.971] [SEVERE ] exit button pressed
+[12:08:47.972] [SEVERE ] thanks for playing... it was fun!
+[12:08:47.972] [INFO   ] thread main terminated.

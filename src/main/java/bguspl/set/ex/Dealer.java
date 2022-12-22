@@ -3,10 +3,7 @@ package bguspl.set.ex;
 import bguspl.set.Env;
 import bguspl.set.ThreadLogger;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,12 +38,14 @@ public class Dealer implements Runnable {
      * The time when the dealer needs to reshuffle the deck due to turn timeout.
      */
     private long reshuffleTime = Long.MAX_VALUE;
+    private LinkedList<int[]> cardsToRemove;
 
     public Dealer(Env env, Table table, Player[] players) {
         this.env = env;
         this.table = table;
         this.players = players;
         deck = IntStream.range(0, env.config.deckSize).boxed().collect(Collectors.toList());
+        cardsToRemove = new LinkedList<>();
     }
 
     /**
@@ -55,16 +54,20 @@ public class Dealer implements Runnable {
     @Override
     public void run() {
         env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
-        while (!shouldFinish()) {
-            placeCardsOnTable();
-            for (Player p: players) {
-                Thread t = new Thread(p);
-                t.start();
-            }
-            timerLoop();
-            updateTimerDisplay(false);
-            removeAllCardsFromTable();
+        for (Player p: players) {
+            Thread t = new Thread(p);
+            t.start();
         }
+        while (!shouldFinish()) {
+
+            placeCardsOnTable();
+            updateTimerDisplay(false);
+            timerLoop();
+            removeAllCardsFromTable();
+
+        }
+
+
         announceWinners();
         env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
     }
@@ -102,6 +105,24 @@ public class Dealer implements Runnable {
      */
     private void removeCardsFromTable() {
         // TODO implement
+        while (!terminate)
+        {
+            if (!cardsToRemove.isEmpty()) {
+
+                int[] ToRemove = cardsToRemove.getFirst();
+                cardsToRemove.removeFirst();
+                int[] slots = new int[3];
+                for (int i = 0; i < 3; i++) {
+                    slots[i] = table.cardToSlot[ToRemove[i]];
+                    for (Player p:players) {
+                        table.removeCard(slots[i]);
+                        table.removeToken(p.id,slots[i]);
+
+                    }
+                }
+            }
+
+        }
     }
 
     /**
@@ -154,6 +175,7 @@ public class Dealer implements Runnable {
     public boolean CheckPlayerSet(int playerId)//this methods cheks if a player has a set and calles the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
+        cardsToRemove.add(PlayerCards);
         boolean isSet =  env.util.testSet(PlayerCards);
         if(isSet){
             FreezePlayerForPoint(playerId);

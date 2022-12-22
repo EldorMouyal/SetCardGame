@@ -117,12 +117,11 @@ public class Dealer implements Runnable {
                     for (Player p:players) {
                         table.removeCard(slots[i]);
                         table.removeToken(p.id,slots[i]);
-                        placeCardsOnTable();
-
                     }
+
                 }
             }
-
+            placeCardsOnTable();
         }
     }
 
@@ -179,12 +178,17 @@ public class Dealer implements Runnable {
         boolean isSet =  env.util.testSet(PlayerCards);
         if(isSet){
             FreezePlayerForPoint(playerId);
-            cardsToRemove.add(PlayerCards);
+            boolean isOnRemoveList=false;
+            for(int[] c: cardsToRemove) {
+                if (c[0] == PlayerCards[0] && c[1] == PlayerCards[1] && c[2] == PlayerCards[2])
+                    isOnRemoveList = true;
+            }
+                if (!isOnRemoveList)
+                    {cardsToRemove.add(PlayerCards);}
         }
         else{
-            //env.ui.setFreeze(playerId,env.config.penaltyFreezeMillis);
-      FreezePlayerForPenalty(playerId);
-          }
+              FreezePlayerForPenalty(playerId);
+            }
         return isSet;
     }
 

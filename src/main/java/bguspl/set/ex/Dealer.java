@@ -78,6 +78,7 @@ public class Dealer implements Runnable {
      */
     private void timerLoop() {
         while (!terminate && System.currentTimeMillis() < reshuffleTime) {
+            System.out.println("w");
             sleepUntilWokenOrTimeout();
             updateTimerDisplay(false);
             removeCardsFromTable();
@@ -201,7 +202,9 @@ public class Dealer implements Runnable {
                 }
             }}
                 if (!isOnRemoveList)
-                    {cardsToRemove.add(PlayerCards);}
+                    {
+                        cardsToRemove.add(PlayerCards);
+                    }
                 else {FreezePlayerForPoint(playerId);}
         }
         else{

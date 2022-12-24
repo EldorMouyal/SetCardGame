@@ -190,14 +190,19 @@ public class Dealer implements Runnable {
         int[] PlayerCards= table.GetPlayerCards(playerId);
         boolean isSet =  env.util.testSet(PlayerCards);
         if(isSet){
-            FreezePlayerForPoint(playerId);
             boolean isOnRemoveList=false;
+            synchronized (table){
             for(int[] c: cardsToRemove) {
-                if (c[0] == PlayerCards[0] && c[1] == PlayerCards[1] && c[2] == PlayerCards[2])
-                    isOnRemoveList = true;
-            }
+                for(int i=0;i<c.length;i++)
+                {
+                    if(c[i]==PlayerCards[0]||c[i]==PlayerCards[1]||c[i]==PlayerCards[2])
+                        isOnRemoveList = true;
+
+                }
+            }}
                 if (!isOnRemoveList)
                     {cardsToRemove.add(PlayerCards);}
+                else {FreezePlayerForPoint(playerId);}
         }
         else{
               FreezePlayerForPenalty(playerId);

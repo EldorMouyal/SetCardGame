@@ -56,7 +56,7 @@ public class Player implements Runnable {
     private int score;
     private int tokensPlaced;
 
-    private Queue<Integer> actionsTodo;
+    private Queue<Integer> slotsTodo;
     private Queue<Integer> cardsTodo;
     /**
      * The class constructor.
@@ -74,7 +74,7 @@ public class Player implements Runnable {
         this.human = human;
         this.dealer=dealer;
         this.tokensPlaced = 0;
-        actionsTodo= new LinkedList<>();
+        slotsTodo= new LinkedList<>();
         cardsTodo= new LinkedList<>();
     }
 
@@ -90,8 +90,8 @@ public class Player implements Runnable {
         while (!terminate) {
             // TODO implement main player loop
             try {
-                    if (!actionsTodo.isEmpty()) {
-                        Integer slot = actionsTodo.remove();
+                    if (!slotsTodo.isEmpty()) {
+                        Integer slot = slotsTodo.remove();
                         Integer card=cardsTodo.remove();
                         if (!table.removeToken(this.id, slot)) {
                             if(tokensPlaced < 3) {
@@ -115,12 +115,15 @@ public class Player implements Runnable {
                     }
             }
             //catch (InterruptedException ignored) {}
+
             catch (NoSuchElementException e) {
+                synchronized (this)
+                {
                 try {
                     wait();
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
-                }
+                }}
             }
         }
         if (!human) try { aiThread.join(); } catch (InterruptedException ignored) {}
@@ -140,7 +143,7 @@ public class Player implements Runnable {
 
                 // TODO implement player key press simulator
                 try {
-                        wait();
+                    wait();
                 }
                 catch (InterruptedException ignored) {}
 
@@ -164,7 +167,7 @@ public class Player implements Runnable {
      */
     public void keyPressed(int slot) {
         // TODO implement
-            actionsTodo.add(slot);
+            slotsTodo.add(slot);
             cardsTodo.add(table.slotToCard[slot]);
     }
 
@@ -187,7 +190,8 @@ public class Player implements Runnable {
      */
     public void penalty() {
         // TODO implement
-            actionsTodo.clear();
+        slotsTodo.clear();
+        cardsTodo.clear();
 
     }
 

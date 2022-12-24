@@ -57,6 +57,7 @@ public class Player implements Runnable {
     private int tokensPlaced;
 
     private Queue<Integer> actionsTodo;
+    private Queue<Integer> cardsTodo;
     /**
      * The class constructor.
      *
@@ -74,6 +75,7 @@ public class Player implements Runnable {
         this.dealer=dealer;
         this.tokensPlaced = 0;
         actionsTodo= new LinkedList<>();
+        cardsTodo= new LinkedList<>();
     }
 
     /**
@@ -90,11 +92,11 @@ public class Player implements Runnable {
             try {
                     if (!actionsTodo.isEmpty()) {
                         Integer slot = actionsTodo.remove();
+                        Integer card=cardsTodo.remove();
                         if (!table.removeToken(this.id, slot)) {
                             if(tokensPlaced < 3) {
-                                env.ui.placeToken(this.id, slot);
-                                table.placeToken(this.id, slot);
-                                tokensPlaced++;
+                                if (table.placeToken(this.id, slot,card))
+                                    tokensPlaced++;
 
                                 if (tokensPlaced == 3) {
                                     if (this.dealer.CheckPlayerSet(this.id)) {
@@ -163,6 +165,7 @@ public class Player implements Runnable {
     public void keyPressed(int slot) {
         // TODO implement
             actionsTodo.add(slot);
+            cardsTodo.add(table.slotToCard[slot]);
     }
 
     /**
@@ -196,4 +199,6 @@ public class Player implements Runnable {
         if (tokensPlaced>0)
             tokensPlaced--;
     }
+
+
 }

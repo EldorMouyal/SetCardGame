@@ -131,6 +131,21 @@ public class Table {
         // TODO implement
         if (slotToCard[slot]!= null)
             tokensToSlot[slot].add(player);
+            env.ui.placeToken(player, slot);
+
+    }
+
+    public boolean placeToken(int player,int slot, int card)
+    {
+        boolean placed = false;
+
+        synchronized (this) {
+            if (card == slotToCard[slot]) {
+                placed = true;
+                placeToken(player, slot);
+            }
+        }
+        return placed;
     }
 
     /**

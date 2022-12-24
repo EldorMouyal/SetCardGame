@@ -182,5 +182,11 @@ public class Table {
             return cards;
         }
 
+    public void removeAllToken() {
+        for(int i = 0; i< tokensToSlot.length; i++) {
+            tokensToSlot[i].clear();
+        }
+        env.ui.removeTokens();
     }
+}
 

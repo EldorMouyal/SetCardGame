@@ -38,6 +38,8 @@ public class Dealer implements Runnable {
      * The time when the dealer needs to reshuffle the deck due to turn timeout.
      */
     private long reshuffleTime = Long.MAX_VALUE;
+    private  long roundStartTime;
+    private  long roundCurrentTime;
     private LinkedList<int[]> cardsToRemove;
 
     public Dealer(Env env, Table table, Player[] players) {
@@ -60,12 +62,10 @@ public class Dealer implements Runnable {
         }
         doesNum2HasChance();
         while (!shouldFinish()) {
-
             placeCardsOnTable();
-            updateTimerDisplay(false);
+            updateTimerDisplay(true);
             timerLoop();
             removeAllCardsFromTable();
-
         }
         //if the game is finished then wi announce winners.
         announceWinners();
@@ -78,7 +78,6 @@ public class Dealer implements Runnable {
      */
     private void timerLoop() {
         while (!terminate && System.currentTimeMillis() < reshuffleTime) {
-            System.out.println("w");
             sleepUntilWokenOrTimeout();
             updateTimerDisplay(false);
                 removeCardsFromTable();
@@ -108,10 +107,7 @@ public class Dealer implements Runnable {
      */
     private void removeCardsFromTable() {
         // TODO implement
-        while (!terminate)
-        {
             if (!cardsToRemove.isEmpty()) {
-
                 synchronized (table) {//avoiding letting a player to place tokens while no cards on table
                     int[] ToRemove = cardsToRemove.removeFirst();//making an array of the first set that need to get removed
                     int[] slots = new int[3];
@@ -124,12 +120,11 @@ public class Dealer implements Runnable {
                         }
 
                     }
-                    placeCardsOnTable();//placing new cards on table
-
                 }
+                updateTimerDisplay(true);
             }
         }
-    }
+
 
     /**
      * Check if any cards can be removed from the deck and placed on the table.
@@ -163,8 +158,15 @@ public class Dealer implements Runnable {
      */
     private void updateTimerDisplay(boolean reset) {
         // TODO implement
-        if(reset)
-            env.ui.setCountdown(env.config.turnTimeoutMillis,false);
+        if(reset){
+            roundStartTime = System.currentTimeMillis();
+            reshuffleTime = roundStartTime + env.config.turnTimeoutMillis + 900 ;
+        }
+        roundCurrentTime = (reshuffleTime - System.currentTimeMillis());
+        if(roundCurrentTime <= 0){
+            roundCurrentTime = 0;
+        }
+        env.ui.setCountdown(roundCurrentTime, roundCurrentTime <= env.config.turnTimeoutWarningMillis);
     }
 
     /**
@@ -172,6 +174,18 @@ public class Dealer implements Runnable {
      */
     private void removeAllCardsFromTable() {
         // TODO implement
+        synchronized (table) {
+            for (int i = 0; i < env.config.tableSize; i++) {
+                deck.add(table.slotToCard[i]);
+                env.ui.removeCard(i);
+                table.slotToCard[i] = null;
+                table.cardToSlot[deck.get(0)] = null;
+            }
+            for (Player p:players) {
+                p.removeTokens();
+            }
+            table.removeAllToken();
+        }
     }
 
     /**

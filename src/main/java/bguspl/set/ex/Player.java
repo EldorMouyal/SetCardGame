@@ -203,5 +203,10 @@ public class Player implements Runnable {
             tokensPlaced--;
     }
 
+    public void removeTokens()
+    {
+        tokensPlaced=0;
+    }
+
 
 }

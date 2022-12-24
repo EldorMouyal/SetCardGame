@@ -93,11 +93,10 @@ public class Player implements Runnable {
                     if (!slotsTodo.isEmpty()) {
                         Integer slot = slotsTodo.remove();
                         Integer card=cardsTodo.remove();
-                        if (!table.removeToken(this.id, slot)) {
+                        if ( !table.removeToken(this.id, slot)) {
                             if(tokensPlaced < 3) {
-                                if (table.placeToken(this.id, slot,card))
-                                    tokensPlaced++;
-
+                                if (card!=null &&table.placeToken(this.id, slot,card))
+                                    {tokensPlaced++;};
                                 if (tokensPlaced == 3) {
                                     if (this.dealer.CheckPlayerSet(this.id)) {
                                         point();
@@ -110,8 +109,7 @@ public class Player implements Runnable {
                         } else {
                             tokensPlaced--;
                         }
-                        //notifyAll();
-                        //wait();
+
                     }
             }
             //catch (InterruptedException ignored) {}
@@ -119,6 +117,7 @@ public class Player implements Runnable {
             catch (NoSuchElementException e) {
                 synchronized (this)
                 {
+
                 try {
                     wait();
                 } catch (InterruptedException ex) {

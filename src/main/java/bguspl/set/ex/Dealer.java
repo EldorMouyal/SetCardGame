@@ -81,10 +81,10 @@ public class Dealer implements Runnable {
             System.out.println("w");
             sleepUntilWokenOrTimeout();
             updateTimerDisplay(false);
-            removeCardsFromTable();
-            placeCardsOnTable();
+                removeCardsFromTable();
+                placeCardsOnTable();
+            }
         }
-    }
 
     /**
      * Called when the game should be terminated.
@@ -113,8 +113,7 @@ public class Dealer implements Runnable {
             if (!cardsToRemove.isEmpty()) {
 
                 synchronized (table) {//avoiding letting a player to place tokens while no cards on table
-                    int[] ToRemove = cardsToRemove.getFirst();//making an array of the first set that need to get removed
-                    cardsToRemove.removeFirst();
+                    int[] ToRemove = cardsToRemove.removeFirst();//making an array of the first set that need to get removed
                     int[] slots = new int[3];
                     for (int i = 0; i < 3; i++) {//removing the set and its tokens
                         slots[i] = table.cardToSlot[ToRemove[i]];
@@ -138,7 +137,9 @@ public class Dealer implements Runnable {
     private void placeCardsOnTable() {
         // TODO implement
         Collections.shuffle(deck);
+
         for (int i = 0;i<table.slotToCard.length; i++) {
+
             if(table.slotToCard[i] == null){
                 table.placeCard(deck.remove(0),i);
             }
@@ -189,27 +190,36 @@ public class Dealer implements Runnable {
     public boolean CheckPlayerSet(int playerId)//this methods checks if a player has a set and calls the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
-        boolean isSet =  env.util.testSet(PlayerCards);
-        if(isSet){
-            boolean isOnRemoveList=false;
+        boolean isSet =  false;
+        boolean isSetBefore =  env.util.testSet(PlayerCards);
+
+        boolean isOnRemoveList=false;
+            synchronized (cardsToRemove){
             synchronized (table){
             for(int[] c: cardsToRemove) {
                 for(int i=0;i<c.length;i++)
                 {
-                    if(c[i]==PlayerCards[0]||c[i]==PlayerCards[1]||c[i]==PlayerCards[2])
+                    if(c[i]==PlayerCards[0]||c[i]==PlayerCards[1]||c[i]==PlayerCards[2]) {
                         isOnRemoveList = true;
+                    }
 
                 }
             }}
                 if (!isOnRemoveList)
                     {
-                        cardsToRemove.add(PlayerCards);
+                       isSet= env.util.testSet(PlayerCards);
+                        if (isSet) {
+                            cardsToRemove.add(PlayerCards);
+                        }
+
                     }
-                else {FreezePlayerForPoint(playerId);}
         }
-        else{
-              FreezePlayerForPenalty(playerId);
-            }
+        if (isSet)
+        {FreezePlayerForPoint(playerId);}
+        else if(!isSetBefore){
+            FreezePlayerForPenalty(playerId);
+        }
+
         return isSet;
     }
 

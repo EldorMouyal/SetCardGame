@@ -178,10 +178,8 @@ public class Player implements Runnable {
      */
     public void point() {
         // TODO implement
-        //System.out.println("yes yes yes");
-
-        //int ignored = table.countCards(); // this part is just for demonstration in the unit tests
         env.ui.setScore(id, ++score);
+        removeTokens();
     }
 
     /**
@@ -191,7 +189,6 @@ public class Player implements Runnable {
         // TODO implement
         slotsTodo.clear();
         cardsTodo.clear();
-
     }
 
     public int score() {

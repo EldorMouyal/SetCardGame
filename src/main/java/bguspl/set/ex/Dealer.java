@@ -118,7 +118,7 @@ public class Dealer implements Runnable {
                         for (Player p : players) {
                             table.removeCard(slots[i]);
                             table.removeToken(p.id, slots[i]);
-                            p.decreaseTokens();
+                            p.decreaseToken();
                         }
 
                     }
@@ -186,7 +186,7 @@ public class Dealer implements Runnable {
             for (Player p:players) {
                 p.removeTokens();
             }
-            table.removeAllToken();
+            table.removeAllTokens();
         }
     }
 
@@ -239,8 +239,8 @@ public class Dealer implements Runnable {
             long d = env.config.penaltyFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);
-                d = d - 1000;
+                Thread.sleep(1);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                d = d - d;
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}
@@ -251,8 +251,8 @@ public class Dealer implements Runnable {
             long d = env.config.pointFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);
-                d = d - 1000;
+                Thread.sleep(1);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                d = d - d;
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}

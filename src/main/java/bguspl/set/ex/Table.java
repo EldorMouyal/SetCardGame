@@ -127,24 +127,21 @@ public class Table {
      * @param player - the player the token belongs to.
      * @param slot   - the slot on which to place the token.
      */
-    public void placeToken(int player, int slot) {
+    public synchronized void placeToken(int player, int slot) {
         // TODO implement
-        if (slotToCard[slot]!= null)
+        if (slotToCard[slot]!= null) {
             tokensToSlot[slot].add(player);
             env.ui.placeToken(player, slot);
-
+        }
     }
 
-    public boolean placeToken(int player,int slot, int card)
+    public synchronized boolean placeToken(int player,int slot, int card)
     {
         boolean placed = false;
-
-        synchronized (this) {
             if (card == slotToCard[slot]) {
                 placed = true;
                 placeToken(player, slot);
             }
-        }
         return placed;
     }
 
@@ -164,11 +161,10 @@ public class Table {
                 return true;
             }
         }
-
         return false;
-        }
+    }
 
-        public  int[] GetPlayerCards(int playerId)
+        public int[] GetPlayerCards(int playerId)
         {
             int[] cards = new int[3];
             int cardIndex = 0;
@@ -182,7 +178,7 @@ public class Table {
             return cards;
         }
 
-    public void removeAllToken() {
+    public void removeAllTokens() {
         for(int i = 0; i< tokensToSlot.length; i++) {
             tokensToSlot[i].clear();
         }

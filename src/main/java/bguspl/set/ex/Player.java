@@ -5,6 +5,7 @@ import bguspl.set.Env;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.Random;
 
 /**
  * This class manages the players' threads and data
@@ -58,6 +59,8 @@ public class Player implements Runnable {
 
     private final Queue<Integer> slotsTodo;
     private final Queue<Integer> cardsTodo;
+    private Random rnd;
+    int randomInt;
     /**
      * The class constructor.
      *
@@ -76,6 +79,7 @@ public class Player implements Runnable {
         this.tokensPlaced = 0;
         slotsTodo= new LinkedList<>();
         cardsTodo= new LinkedList<>();
+        rnd = new Random();
     }
 
     /**
@@ -85,14 +89,15 @@ public class Player implements Runnable {
     public void run() {
         playerThread = Thread.currentThread();
         env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
-        if (!human) createArtificialIntelligence();
+        //if (!human) createArtificialIntelligence();
 
         while (!terminate) {
             // TODO implement main player loop
             try {
+                if (!human) createArtificialIntelligence();
                     if (!slotsTodo.isEmpty()) {
                         Integer slot = slotsTodo.remove();
-                        Integer card=cardsTodo.remove();
+                        Integer card = cardsTodo.remove();
                         if ( !table.removeToken(this.id, slot)) {
                             if(tokensPlaced < 3) {
                                 if (card!=null &&table.placeToken(this.id, slot,card))
@@ -100,7 +105,7 @@ public class Player implements Runnable {
                                 if (tokensPlaced == 3) {
                                     if (this.dealer.CheckPlayerSet(this.id)) {
                                         point();
-                                        tokensPlaced = 0;
+                                        removeTokens();
                                     }
                                     else
                                         penalty();
@@ -109,22 +114,19 @@ public class Player implements Runnable {
                         } else {
                             tokensPlaced--;
                         }
-
                     }
             }
-            //catch (InterruptedException ignored) {}
-
             catch (NoSuchElementException e) {
                 synchronized (this)
                 {
-
                 try {
                     wait();
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
-                }}
+                }
             }
         }
+    }
         if (!human) try { aiThread.join(); } catch (InterruptedException ignored) {}
         env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
     }
@@ -139,13 +141,15 @@ public class Player implements Runnable {
         aiThread = new Thread(() -> {
             env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
             while (!terminate) {
-
-                // TODO implement player key press simulator
-                try {
-                    wait();
+                // TODO implement player key press
+                randomInt = rnd.nextInt(env.config.tableSize);
+                this.keyPressed(randomInt);
+                synchronized (this) {
+                    try {
+                        wait();
+                    } catch (InterruptedException ignored) {
+                    }
                 }
-                catch (InterruptedException ignored) {}
-
             }
             env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
         }, "computer-" + id);
@@ -157,6 +161,7 @@ public class Player implements Runnable {
      */
     public void terminate() {
         // TODO implement
+        terminate = true;
     }
 
     /**
@@ -179,7 +184,6 @@ public class Player implements Runnable {
     public void point() {
         // TODO implement
         env.ui.setScore(id, ++score);
-        //removeTokens();
     }
 
     /**
@@ -204,6 +208,4 @@ public class Player implements Runnable {
     {
         tokensPlaced=0;
     }
-
-
 }

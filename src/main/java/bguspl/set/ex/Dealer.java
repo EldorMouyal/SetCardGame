@@ -208,34 +208,28 @@ public class Dealer implements Runnable {
         int[] PlayerCards= table.GetPlayerCards(playerId);
         boolean isSet =  false;
         boolean isSetBefore =  env.util.testSet(PlayerCards);
-
         boolean isOnRemoveList=false;
-            synchronized (cardsToRemove){
+
+        synchronized (cardsToRemove){
             synchronized (table){
-            for(int[] c: cardsToRemove) {
-                for(int i=0;i<c.length;i++)
-                {
-                    if(c[i]==PlayerCards[0]||c[i]==PlayerCards[1]||c[i]==PlayerCards[2]) {
-                        isOnRemoveList = true;
+                for(int[] c: cardsToRemove) {
+                    for(int i=0;i<c.length;i++) {
+                        if(c[i]==PlayerCards[0] || c[i]==PlayerCards[1] || c[i]==PlayerCards[2])
+                            isOnRemoveList = true;
                     }
-
                 }
-            }}
-                if (!isOnRemoveList)
-                    {
-                       isSet= env.util.testSet(PlayerCards);
-                        if (isSet) {
-                            cardsToRemove.add(PlayerCards);
-                        }
-
-                    }
+            }
+                if (!isOnRemoveList){
+                   isSet= env.util.testSet(PlayerCards);
+                    if (isSet)
+                        cardsToRemove.add(PlayerCards);
+                }
         }
         if (isSet)
-        {FreezePlayerForPoint(playerId);}
+            FreezePlayerForPoint(playerId);
         else if(!isSetBefore){
             FreezePlayerForPenalty(playerId);
         }
-
         return isSet;
     }
 
@@ -262,34 +256,5 @@ public class Dealer implements Runnable {
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}
-    }
-
-    public void doesNum2HasChance()//check if there is still a possibillity for #2 player to get the 1# places
-    {
-        int score1=0;
-        int score2=0;
-        for (int i=0; i< players.length;i++)
-        {
-            if (players[i].score()>score1)
-            {
-                score2=score1;
-                score1=players[i].score();
-            }
-            else
-            {
-                if (players[i].score()>score2)
-                {
-                    score2=players[i].score();
-                }
-            }
-        }
-
-        int difference=env.util.findSets(deck, score1-score2).size();
-
-        if (difference<score1-score2)
-        {
-            terminate=true;
-        }
-
     }
 }

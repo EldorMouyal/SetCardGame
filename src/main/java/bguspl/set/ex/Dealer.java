@@ -40,7 +40,7 @@ public class Dealer implements Runnable {
     private long reshuffleTime = Long.MAX_VALUE;
     private  long roundStartTime;
     private  long roundCurrentTime;
-    private LinkedList<int[]> cardsToRemove;
+    private  final LinkedList<int[]> cardsToRemove;
 
     public Dealer(Env env, Table table, Player[] players) {
         this.env = env;
@@ -60,14 +60,13 @@ public class Dealer implements Runnable {
             Thread t = new Thread(p);
             t.start();
         }
-        doesNum2HasChance();
         while (!shouldFinish()) {
             placeCardsOnTable();
             updateTimerDisplay(true);
             timerLoop();
             removeAllCardsFromTable();
         }
-        //if the game is finished then wi announce winners.
+        //if the game is finished then we announce winners.
         announceWinners();
         env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
         terminate();
@@ -90,7 +89,10 @@ public class Dealer implements Runnable {
      */
     public void terminate() {
         // TODO implement
-
+        for (Player p:players
+             ) {p.terminate();
+        }
+            this.terminate = true;
     }
 
     /**

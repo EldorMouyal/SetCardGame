@@ -56,8 +56,8 @@ public class Player implements Runnable {
     private int score;
     private int tokensPlaced;
 
-    private Queue<Integer> slotsTodo;
-    private Queue<Integer> cardsTodo;
+    private final Queue<Integer> slotsTodo;
+    private final Queue<Integer> cardsTodo;
     /**
      * The class constructor.
      *
@@ -96,7 +96,7 @@ public class Player implements Runnable {
                         if ( !table.removeToken(this.id, slot)) {
                             if(tokensPlaced < 3) {
                                 if (card!=null &&table.placeToken(this.id, slot,card))
-                                    {tokensPlaced++;};
+                                    {tokensPlaced++;}
                                 if (tokensPlaced == 3) {
                                     if (this.dealer.CheckPlayerSet(this.id)) {
                                         point();
@@ -179,7 +179,7 @@ public class Player implements Runnable {
     public void point() {
         // TODO implement
         env.ui.setScore(id, ++score);
-        removeTokens();
+        //removeTokens();
     }
 
     /**

@@ -141,7 +141,7 @@ public class Dealer implements Runnable {
         Collections.shuffle(deck);
 
         for (int i = 0;i<table.slotToCard.length; i++) {
-            if(table.slotToCard[i] == null){
+            if(table.slotToCard[i] == null && !deck.isEmpty()){
                 table.placeCard(deck.remove(0),i);
             }
         }

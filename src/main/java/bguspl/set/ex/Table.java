@@ -177,9 +177,10 @@ public class Table {
     {
         int[] cards = new int[3];
         int cardIndex = 0;
-        for (int i=0; i<tokensToSlot.length;i++)
+        List<Integer>[] copyList = tokensToSlot.clone();
+        for (int i=0; i<copyList.length;i++)
         {
-            for (int j:tokensToSlot[i]) {
+            for (int j:copyList[i]) {
                 if(j == playerId)
                     cards[cardIndex++] = slotToCard[i];
             }

@@ -2,10 +2,7 @@ package bguspl.set.ex;
 
 import bguspl.set.Env;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -172,14 +169,14 @@ public class Table {
         }
         return false;
     }
-
     public synchronized int[] GetPlayerCards(int playerId)
     {
         int[] cards = new int[3];
         int cardIndex = 0;
-        for (int i=0; i<tokensToSlot.length;i++)
+        List<Integer>[] copyOfTokensToSlot = tokensToSlot.clone();
+        for (int i=0; i<copyOfTokensToSlot.length;i++)
         {
-            for (int j:tokensToSlot[i]) {
+            for (int j:copyOfTokensToSlot[i]) {
                 if(j == playerId)
                     cards[cardIndex++] = slotToCard[i];
             }

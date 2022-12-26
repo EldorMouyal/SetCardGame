@@ -107,7 +107,7 @@ public class Dealer implements Runnable {
      * @return true iff the game should be finished.
      */
     private boolean shouldFinish() {
-        return terminate || env.util.findSets(deck, 1).size() == 0;
+        return deck.isEmpty()||terminate || env.util.findSets(deck, 1).size() == 0;
     }
 
     /**
@@ -141,7 +141,7 @@ public class Dealer implements Runnable {
         Collections.shuffle(deck);
 
         for (int i = 0;i<table.slotToCard.length; i++) {
-            if(table.slotToCard[i] == null){
+            if(table.slotToCard[i] == null&&!deck.isEmpty()){
                 table.placeCard(deck.remove(0),i);
             }
         }
@@ -189,6 +189,8 @@ public class Dealer implements Runnable {
                 p.removeTokens();
             }
             table.removeAllTokens();
+            synchronized (this){
+            notifyAll();}
         }
     }
 
@@ -222,8 +224,8 @@ public class Dealer implements Runnable {
     private boolean CheckPlayerSet(int playerId)//this methods checks if a player has a set and calls the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
-        boolean isSet =  false;
         boolean isSetBefore =  env.util.testSet(PlayerCards);
+        boolean isSet =  false;
         boolean isOnRemoveList=false;
 
         synchronized (cardsToRemove){
@@ -256,7 +258,7 @@ public class Dealer implements Runnable {
             long d = env.config.penaltyFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                Thread.sleep(1000);
                 d = d - 1000;
             }
             env.ui.setFreeze(playerId,d);
@@ -268,7 +270,7 @@ public class Dealer implements Runnable {
             long d = env.config.pointFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                Thread.sleep(1000);
                 d = d - 1000;
             }
             env.ui.setFreeze(playerId,d);

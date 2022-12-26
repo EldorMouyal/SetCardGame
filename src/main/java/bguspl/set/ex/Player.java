@@ -105,7 +105,7 @@ public class Player implements Runnable {
                                 increaseToken();
                             }
                             if (tokensPlaced == 3) {
-                                if (this.dealer.CheckPlayerSet(this.id)) {
+                                if (this.dealer.addPlayerRequest(this.id)) {
                                     point();
                                 } else
                                     penalty();

@@ -108,7 +108,7 @@ public class Table {
      * Removes a card from a grid slot on the table.
      * @param slot - the slot from which to remove the card.
      */
-    public synchronized void removeCard(int slot) {
+    public void removeCard(int slot) {
         try {
             Thread.sleep(env.config.tableDelayMillis);
         } catch (InterruptedException ignored) {}
@@ -129,20 +129,26 @@ public class Table {
      */
     public void placeToken(int player, int slot) {
         // TODO implement
-        if (slotToCard[slot]!= null)
+        if (slotToCard[slot]!= null) {
             tokensToSlot[slot].add(player);
             env.ui.placeToken(player, slot);
-
+        }
     }
 
     public boolean placeToken(int player,int slot, int card)
     {
         boolean placed = false;
-
         synchronized (this) {
-            if (card == slotToCard[slot]) {
-                placed = true;
-                placeToken(player, slot);
+            if (slotToCard[slot] != null && card == slotToCard[slot]) {
+                int counter=0;
+                for(int i=0;i<tokensToSlot.length&counter<3;i++)
+                {
+                    if (tokensToSlot[i].contains(player))
+                        counter++;
+                }
+                if (counter<3){
+                    placed = true;
+                    placeToken(player, slot);}
             }
         }
         return placed;
@@ -154,7 +160,7 @@ public class Table {
      * @param slot   - the slot from which to remove the token.
      * @return       - true iff a token was successfully removed.
      */
-    public synchronized boolean removeToken(int player, int slot) {
+    public boolean removeToken(int player, int slot) {
         // TODO implement
         for (int i=0; i<tokensToSlot[slot].size();i++)
         {
@@ -164,25 +170,24 @@ public class Table {
                 return true;
             }
         }
-
         return false;
-        }
+    }
 
-        public  int[] GetPlayerCards(int playerId)
+    public synchronized int[] GetPlayerCards(int playerId)
+    {
+        int[] cards = new int[3];
+        int cardIndex = 0;
+        for (int i=0; i<tokensToSlot.length;i++)
         {
-            int[] cards = new int[3];
-            int cardIndex = 0;
-            for (int i=0; i<tokensToSlot.length;i++)
-            {
-                for (int j:tokensToSlot[i]) {
-                    if(j == playerId)
-                        cards[cardIndex++] = slotToCard[i];
-                }
+            for (int j:tokensToSlot[i]) {
+                if(j == playerId)
+                    cards[cardIndex++] = slotToCard[i];
             }
-            return cards;
         }
+        return cards;
+    }
 
-    public void removeAllToken() {
+    public void removeAllTokens() {
         for(int i = 0; i< tokensToSlot.length; i++) {
             tokensToSlot[i].clear();
         }

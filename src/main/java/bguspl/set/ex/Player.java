@@ -94,27 +94,26 @@ public class Player implements Runnable {
         while (!terminate) {
             // TODO implement main player loop
             try {
-                if (!human) createArtificialIntelligence();
-                    if (!slotsTodo.isEmpty()) {
-                        Integer slot = slotsTodo.remove();
-                        Integer card = cardsTodo.remove();
-                        if ( !table.removeToken(this.id, slot)) {
-                            if(tokensPlaced < 3) {
-                                if (card!=null &&table.placeToken(this.id, slot,card))
-                                    {tokensPlaced++;}
-                                if (tokensPlaced == 3) {
-                                    if (this.dealer.CheckPlayerSet(this.id)) {
-                                        point();
-                                        removeTokens();
-                                    }
-                                    else
-                                        penalty();
-                                }
+                if (!human) {createArtificialIntelligence();}
+                if (!slotsTodo.isEmpty()) {
+                    Integer slot = slotsTodo.remove();
+                    Integer card = cardsTodo.remove();
+
+                    if (!table.removeToken(this.id, slot)) {
+                        if (tokensPlaced < 3) {
+                            if (card != null && table.placeToken(this.id, slot, card)) {
+                                increaseToken();
                             }
-                        } else {
-                            tokensPlaced--;
+                            if (tokensPlaced == 3) {
+                                if (this.dealer.addPlayerRequest(this.id)) {
+                                    point();
+                                } else
+                                    penalty();
+                            }
                         }
-                    }
+                    } else
+                        decreaseToken();
+                }
             }
             catch (NoSuchElementException e) {
                 synchronized (this)
@@ -184,6 +183,7 @@ public class Player implements Runnable {
     public void point() {
         // TODO implement
         env.ui.setScore(id, ++score);
+        removeTokens();
     }
 
     /**
@@ -198,10 +198,15 @@ public class Player implements Runnable {
     public int score() {
         return score;
     }
-    public void decreaseTokens()
+    public void decreaseToken()
     {
         if (tokensPlaced>0)
             tokensPlaced--;
+    }
+    public void increaseToken()
+    {
+        if(tokensPlaced<3)
+            tokensPlaced++;
     }
 
     public void removeTokens()

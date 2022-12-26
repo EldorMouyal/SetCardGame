@@ -4,6 +4,10 @@ import bguspl.set.Env;
 import bguspl.set.ThreadLogger;
 
 import java.util.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,6 +45,7 @@ public class Dealer implements Runnable {
     private  long roundStartTime;
     private  long roundCurrentTime;
     private  final LinkedList<int[]> cardsToRemove;
+    private BlockingQueue<Integer> playerQueue;
 
     public Dealer(Env env, Table table, Player[] players) {
         this.env = env;
@@ -48,6 +53,7 @@ public class Dealer implements Runnable {
         this.players = players;
         deck = IntStream.range(0, env.config.deckSize).boxed().collect(Collectors.toList());
         cardsToRemove = new LinkedList<>();
+        playerQueue = new LinkedBlockingQueue<>();
     }
 
     /**
@@ -79,10 +85,10 @@ public class Dealer implements Runnable {
         while (!terminate && System.currentTimeMillis() < reshuffleTime) {
             sleepUntilWokenOrTimeout();
             updateTimerDisplay(false);
-                removeCardsFromTable();
-                placeCardsOnTable();
-            }
+            removeCardsFromTable();
+            placeCardsOnTable();
         }
+    }
 
     /**
      * Called when the game should be terminated.
@@ -118,9 +124,8 @@ public class Dealer implements Runnable {
                         for (Player p : players) {
                             table.removeCard(slots[i]);
                             table.removeToken(p.id, slots[i]);
-                            p.decreaseTokens();
+                            p.decreaseToken();
                         }
-
                     }
                 }
                 updateTimerDisplay(true);
@@ -136,7 +141,6 @@ public class Dealer implements Runnable {
         Collections.shuffle(deck);
 
         for (int i = 0;i<table.slotToCard.length; i++) {
-
             if(table.slotToCard[i] == null){
                 table.placeCard(deck.remove(0),i);
             }
@@ -179,14 +183,12 @@ public class Dealer implements Runnable {
         synchronized (table) {
             for (int i = 0; i < env.config.tableSize; i++) {
                 deck.add(table.slotToCard[i]);
-                env.ui.removeCard(i);
-                table.slotToCard[i] = null;
-                table.cardToSlot[deck.get(0)] = null;
+                table.removeCard(i);
             }
             for (Player p:players) {
                 p.removeTokens();
             }
-            table.removeAllToken();
+            table.removeAllTokens();
         }
     }
 
@@ -203,7 +205,21 @@ public class Dealer implements Runnable {
         }
         env.ui.announceWinner(playerIds);
     }
-    public boolean CheckPlayerSet(int playerId)//this methods checks if a player has a set and calls the appropriate freeze methode
+
+    public boolean addPlayerRequest(int playerId){
+        playerQueue.add(playerId);
+        synchronized (this) {
+            while (playerQueue.peek() != playerId) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return CheckPlayerSet(playerQueue.remove());
+    }
+    private boolean CheckPlayerSet(int playerId)//this methods checks if a player has a set and calls the appropriate freeze methode
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
         boolean isSet =  false;
@@ -219,17 +235,18 @@ public class Dealer implements Runnable {
                     }
                 }
             }
-                if (!isOnRemoveList){
-                   isSet= env.util.testSet(PlayerCards);
-                    if (isSet)
-                        cardsToRemove.add(PlayerCards);
-                }
+            if (!isOnRemoveList){
+               isSet= env.util.testSet(PlayerCards);
+                if (isSet)
+                    cardsToRemove.add(PlayerCards);
+            }
         }
         if (isSet)
             FreezePlayerForPoint(playerId);
         else if(!isSetBefore){
             FreezePlayerForPenalty(playerId);
         }
+        synchronized (this){notifyAll();}
         return isSet;
     }
 
@@ -239,7 +256,7 @@ public class Dealer implements Runnable {
             long d = env.config.penaltyFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);
+                Thread.sleep(1000);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 d = d - 1000;
             }
             env.ui.setFreeze(playerId,d);
@@ -251,7 +268,7 @@ public class Dealer implements Runnable {
             long d = env.config.pointFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);
+                Thread.sleep(1000);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 d = d - 1000;
             }
             env.ui.setFreeze(playerId,d);

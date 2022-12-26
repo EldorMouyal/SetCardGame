@@ -104,7 +104,6 @@ public class Player implements Runnable {
                             if (card != null && table.placeToken(this.id, slot, card)) {
                                 increaseToken();
                             }
-
                             if (tokensPlaced == 3) {
                                 if (this.dealer.CheckPlayerSet(this.id)) {
                                     point();

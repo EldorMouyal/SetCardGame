@@ -79,8 +79,8 @@ public class Dealer implements Runnable {
         while (!terminate && System.currentTimeMillis() < reshuffleTime) {
             sleepUntilWokenOrTimeout();
             updateTimerDisplay(false);
-                removeCardsFromTable();
-                placeCardsOnTable();
+            removeCardsFromTable();
+            placeCardsOnTable();
             }
         }
 
@@ -120,7 +120,6 @@ public class Dealer implements Runnable {
                             table.removeToken(p.id, slots[i]);
                             p.decreaseToken();
                         }
-
                     }
                 }
                 updateTimerDisplay(true);
@@ -136,7 +135,6 @@ public class Dealer implements Runnable {
         Collections.shuffle(deck);
 
         for (int i = 0;i<table.slotToCard.length; i++) {
-
             if(table.slotToCard[i] == null){
                 table.placeCard(deck.remove(0),i);
             }
@@ -239,8 +237,8 @@ public class Dealer implements Runnable {
             long d = env.config.penaltyFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                d = d - d;
+                Thread.sleep(1000);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                d = d - 1000;
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}
@@ -251,8 +249,8 @@ public class Dealer implements Runnable {
             long d = env.config.pointFreezeMillis ;
             while (d > 0){
                 env.ui.setFreeze(playerId,d);
-                Thread.sleep(1);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                d = d - d;
+                Thread.sleep(1000);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                d = d - 1000;
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}

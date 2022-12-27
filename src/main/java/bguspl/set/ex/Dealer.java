@@ -199,11 +199,27 @@ public class Dealer implements Runnable {
      */
     private synchronized void announceWinners() {
         // TODO implement
-        int[] playerIds= new int[players.length];
-        int i=0;
+        List<Integer> winners= new LinkedList<>();
+        int max=0;
         for(Player p:players)
         {
-            playerIds[i]=p.id;
+            if (p.score()>max)
+                max= p.score();;
+        }
+        for(Player p:players)
+        {
+            if (p.score()==max)
+            {
+                winners.add(p.id);
+            }
+        }
+
+        int[] playerIds= new int[winners.size()];
+        int i=0;
+        for(int id:winners)
+        {
+            playerIds[i]=id;
+            i++;
         }
         env.ui.announceWinner(playerIds);
     }

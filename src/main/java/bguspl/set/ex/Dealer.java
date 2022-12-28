@@ -99,6 +99,7 @@ public class Dealer implements Runnable {
              ) {p.terminate();
         }
             this.terminate = true;
+
     }
 
     /**
@@ -107,7 +108,8 @@ public class Dealer implements Runnable {
      * @return true iff the game should be finished.
      */
     private boolean shouldFinish() {
-        return deck.isEmpty()||terminate || env.util.findSets(deck, 1).size() == 0;
+        clearNullsFromDeck();
+        return terminate || env.util.findSets(deck, 1).size() == 0;
     }
 
     /**
@@ -139,7 +141,6 @@ public class Dealer implements Runnable {
     private void placeCardsOnTable() {
         // TODO implement
         Collections.shuffle(deck);
-
         for (int i = 0;i<table.slotToCard.length; i++) {
             if(table.slotToCard[i] == null&&!deck.isEmpty()){
                 table.placeCard(deck.remove(0),i);
@@ -199,11 +200,27 @@ public class Dealer implements Runnable {
      */
     private synchronized void announceWinners() {
         // TODO implement
-        int[] playerIds= new int[players.length];
-        int i=0;
+        List<Integer> winners= new LinkedList<>();
+        int max=0;
         for(Player p:players)
         {
-            playerIds[i]=p.id;
+            if (p.score()>max)
+                max= p.score();;
+        }
+        for(Player p:players)
+        {
+            if (p.score()==max)
+            {
+                winners.add(p.id);
+            }
+        }
+
+        int[] playerIds= new int[winners.size()];
+        int i=0;
+        for(int id:winners)
+        {
+            playerIds[i]=id;
+            i++;
         }
         env.ui.announceWinner(playerIds);
     }
@@ -227,7 +244,6 @@ public class Dealer implements Runnable {
         boolean isSetBefore =  env.util.testSet(PlayerCards);
         boolean isSet =  false;
         boolean isOnRemoveList=false;
-
         synchronized (cardsToRemove){
             synchronized (table){
                 for(int[] c: cardsToRemove) {
@@ -275,5 +291,16 @@ public class Dealer implements Runnable {
             }
             env.ui.setFreeze(playerId,d);
         } catch (InterruptedException e) {}
+    }
+
+
+
+    private void clearNullsFromDeck()//removes all null cards from deck
+    {
+        for (int i=0;i<deck.size();i++)
+        {
+            if (deck.get(i)==null)
+                deck.remove(i);
+        }
     }
 }

@@ -85,6 +85,11 @@ public class Dealer implements Runnable {
         while (!terminate && System.currentTimeMillis() < reshuffleTime) {
             sleepUntilWokenOrTimeout();
             updateTimerDisplay(false);
+            for (Player p:players)//##############3added###########
+            {
+                p.updateTimerDisplayForPenalty(false);
+                p.updateTimerDisplayForPoint(false);
+            }
             removeCardsFromTable();
             placeCardsOnTable();
         }
@@ -236,6 +241,7 @@ public class Dealer implements Runnable {
                     throw new RuntimeException(e);
                 }
             }
+            notifyAll();
         }
         return CheckPlayerSet(playerQueue.remove());
     }
@@ -253,6 +259,7 @@ public class Dealer implements Runnable {
                             isOnRemoveList = true;
                     }
                 }
+
             }
             if (!isOnRemoveList){
                isSet= env.util.testSet(PlayerCards);
@@ -260,39 +267,12 @@ public class Dealer implements Runnable {
                     cardsToRemove.add(PlayerCards);
             }
         }
-        if (isSet)
-            FreezePlayerForPoint(playerId);
-        else if(!isSetBefore){
-            FreezePlayerForPenalty(playerId);
-        }
+
         synchronized (this){notifyAll();}
         return isSet;
     }
 
-    private void FreezePlayerForPenalty(int playerId)
-    {
-        try {
-            long d = env.config.penaltyFreezeMillis ;
-            while (d > 0){
-                env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);
-                d = d - 1000;
-            }
-            env.ui.setFreeze(playerId,d);
-        } catch (InterruptedException e) {}
-    }
-    private void FreezePlayerForPoint(int playerId)
-    {
-        try {
-            long d = env.config.pointFreezeMillis ;
-            while (d > 0){
-                env.ui.setFreeze(playerId,d);
-                Thread.sleep(1000);
-                d = d - 1000;
-            }
-            env.ui.setFreeze(playerId,d);
-        } catch (InterruptedException e) {}
-    }
+
 
 
 

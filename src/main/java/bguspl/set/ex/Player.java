@@ -61,6 +61,12 @@ public class Player implements Runnable {
     private final Queue<Integer> cardsTodo;
     private Random rnd;
     int randomInt;
+    private  long freezeTime;//#################################
+    private  long freezeCurrentTime;//#################
+
+
+    private boolean freezeForPoint=false;//################
+    private boolean freezeForPenalty=false;//###########################
     /**
      * The class constructor.
      *
@@ -170,8 +176,9 @@ public class Player implements Runnable {
      */
     public void keyPressed(int slot) {
         // TODO implement
+        if (!freezeForPenalty&&!freezeForPoint){
             slotsTodo.add(slot);
-            cardsTodo.add(table.slotToCard[slot]);
+            cardsTodo.add(table.slotToCard[slot]);}
     }
 
     /**
@@ -182,6 +189,8 @@ public class Player implements Runnable {
      */
     public void point() {
         // TODO implement
+        freezeForPoint=true;//###################
+        updateTimerDisplayForPoint(true);//###################
         env.ui.setScore(id, ++score);
         removeTokens();
     }
@@ -191,6 +200,8 @@ public class Player implements Runnable {
      */
     public void penalty() {
         // TODO implement
+        freezeForPenalty=true;//#################
+        updateTimerDisplayForPenalty(true);//###################
         slotsTodo.clear();
         cardsTodo.clear();
     }
@@ -212,5 +223,34 @@ public class Player implements Runnable {
     public void removeTokens()
     {
         tokensPlaced=0;
+    }
+
+
+
+
+    public void updateTimerDisplayForPenalty(boolean start) {//######################################
+        // TODO implement
+        if(start){
+            freezeTime = System.currentTimeMillis()+env.config.penaltyFreezeMillis;
+        }
+        freezeCurrentTime = (freezeTime - System.currentTimeMillis());
+        if(freezeCurrentTime <= 0){
+           // freezeCurrentTime = 0;
+            freezeForPenalty=false;
+        }
+        env.ui.setFreeze(id, freezeCurrentTime);
+    }
+
+    public void updateTimerDisplayForPoint(boolean start) {//####################################333
+        // TODO implement
+        if(start){
+            freezeTime = System.currentTimeMillis()+env.config.pointFreezeMillis;
+        }
+        freezeCurrentTime = (freezeTime - System.currentTimeMillis());
+        if(freezeCurrentTime <= 0){
+            //freezeCurrentTime = 0;
+            freezeForPoint=false;
+        }
+        env.ui.setFreeze(id, freezeCurrentTime);
     }
 }

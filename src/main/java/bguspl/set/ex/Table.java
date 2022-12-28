@@ -79,6 +79,7 @@ public class Table {
         for (Integer card : slotToCard)
             if (card != null)
                 ++cards;
+        synchronized (this){notifyAll();}//############################################################
         return cards;
     }
 
@@ -99,6 +100,8 @@ public class Table {
 
         // TODO implement
         env.ui.placeCard(card,slot);
+        synchronized (this){notifyAll();}//############################################################
+
     }
 
     /**
@@ -117,6 +120,8 @@ public class Table {
             cardToSlot[card] = null;
             slotToCard[slot] = null;
         }
+        synchronized (this){notifyAll();}//############################################################
+
     }
 
     /**
@@ -147,6 +152,8 @@ public class Table {
                     placed = true;
                     placeToken(player, slot);}
             }
+            notifyAll();//############################################################
+
         }
         return placed;
     }
@@ -173,6 +180,7 @@ public class Table {
     {
         int[] cards = new int[3];
         int cardIndex = 0;
+        synchronized (tokensToSlot){
         List<Integer>[] copyOfTokensToSlot = tokensToSlot.clone();
             for (int i = 0; i < copyOfTokensToSlot.length; i++) {
                 for (int j : copyOfTokensToSlot[i]) {
@@ -180,6 +188,7 @@ public class Table {
                         cards[cardIndex++] = slotToCard[i];
                 }
             }
+        notifyAll();}//############################################################
         return cards;
     }
 

@@ -183,7 +183,8 @@ public class Dealer implements Runnable {
         // TODO implement
         synchronized (table) {
             for (int i = 0; i < env.config.tableSize; i++) {
-                deck.add(table.slotToCard[i]);
+                if(table.slotToCard[i] != null)
+                    deck.add(table.slotToCard[i]);
                 table.removeCard(i);
             }
             for (Player p:players) {

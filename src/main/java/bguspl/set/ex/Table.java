@@ -174,13 +174,12 @@ public class Table {
         int[] cards = new int[3];
         int cardIndex = 0;
         List<Integer>[] copyOfTokensToSlot = tokensToSlot.clone();
-        for (int i=0; i<copyOfTokensToSlot.length;i++)
-        {
-            for (int j:copyOfTokensToSlot[i]) {
-                if(j == playerId)
-                    cards[cardIndex++] = slotToCard[i];
+            for (int i = 0; i < copyOfTokensToSlot.length; i++) {
+                for (int j : copyOfTokensToSlot[i]) {
+                    if (j == playerId)
+                        cards[cardIndex++] = slotToCard[i];
+                }
             }
-        }
         return cards;
     }
 

@@ -90,10 +90,9 @@ public class Dealer implements Runnable {
                 p.updateTimerDisplayForPenalty(false);
                 p.updateTimerDisplayForPoint(false);
             }
-
             removeCardsFromTable();
             placeCardsOnTable();
-            if (checkiftableHasNoSetAndDeckEmpty())//added
+            if (checkIfTableHasNoSetAndDeckEmpty())//added
                 terminate=true;
         }
     }
@@ -294,7 +293,7 @@ public class Dealer implements Runnable {
         }
     }
 
-    private boolean checkiftableHasNoSetAndDeckEmpty()
+    private boolean checkIfTableHasNoSetAndDeckEmpty()
     {
         List<Integer> cards= new LinkedList<>();
         boolean output=true;

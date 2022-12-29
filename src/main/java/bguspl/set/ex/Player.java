@@ -155,13 +155,11 @@ public class Player implements Runnable {
      * key presses. If the queue of key presses is full, the thread waits until it is not full.
      */
     private void createArtificialIntelligence() {
-
         // note: this is a very, very smart AI (!)
         aiThread = new Thread(() -> {
             env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
             while (!terminate) {
                 // TODO implement player key press
-
                 keyPressed(((int)Math.floor(Math.random() * env.config.tableSize)));
             }
             env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
@@ -195,7 +193,6 @@ public class Player implements Runnable {
                 }
             }
            notifyAll();
-
         }
     }
 

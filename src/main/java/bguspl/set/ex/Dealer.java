@@ -128,12 +128,13 @@ public class Dealer implements Runnable {
                     int[] ToRemove = cardsToRemove.removeFirst();//making an array of the first set that need to get removed
                     int[] slots = new int[3];
                     for (int i = 0; i < 3; i++) {//removing the set and its tokens
+                        if(table.cardToSlot[ToRemove[i]]!=null){
                         slots[i] = table.cardToSlot[ToRemove[i]];
                         for (Player p : players) {
                             table.removeCard(slots[i]);
                             table.removeToken(p.id, slots[i]);
                             p.decreaseToken();
-                        }
+                        }}
                     }
                 }
                 updateTimerDisplay(true);

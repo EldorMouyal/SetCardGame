@@ -93,6 +93,8 @@ public class Dealer implements Runnable {
 
             removeCardsFromTable();
             placeCardsOnTable();
+            if (checkiftableHasNoSetAndDeckEmpty())//added
+                terminate=true;
         }
     }
 
@@ -124,7 +126,7 @@ public class Dealer implements Runnable {
     private void removeCardsFromTable() {
         // TODO implement
             if (!cardsToRemove.isEmpty()) {
-               // synchronized (table) {//#################################################################################### removed, not neccesary
+                synchronized (table) {//#################################################################################### removed, not neccesary
                     int[] ToRemove = cardsToRemove.removeFirst();//making an array of the first set that need to get removed
                     int[] slots = new int[3];
                     for (int i = 0; i < 3; i++) {//removing the set and its tokens
@@ -136,7 +138,7 @@ public class Dealer implements Runnable {
                             p.decreaseToken();
                         }}
                     }
-                //}
+                }
                 updateTimerDisplay(true);
             }
         }
@@ -290,5 +292,22 @@ public class Dealer implements Runnable {
             if (deck.get(i)==null)
                 deck.remove(i);
         }
+    }
+
+    private boolean checkiftableHasNoSetAndDeckEmpty()
+    {
+        List<Integer> cards= new LinkedList<>();
+        boolean output=true;
+        synchronized (table) {
+            for(int i=0; i<table.slotToCard.length;i++)
+            {
+                if(table.slotToCard[i]!=null)
+                    cards.add(table.slotToCard[i]);
+            }
+            output=env.util.findSets(cards, 1).size() == 0;
+            table.notifyAll();
+        }
+        return output&&deck.isEmpty();
+
     }
 }

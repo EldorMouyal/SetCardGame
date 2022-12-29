@@ -71,6 +71,8 @@ public class Player implements Runnable {
 
     private boolean freezeForPoint=false;//################
     private boolean freezeForPenalty=false;//###########################
+
+    private int setSize;
     /**
      * The class constructor.
      *
@@ -92,6 +94,7 @@ public class Player implements Runnable {
         Todo= new LinkedBlockingQueue[2];
         Todo[0]=slotsTodo;
         Todo[1]=cardsTodo;
+        setSize = env.config.featureSize;
     }
 
     /**
@@ -113,11 +116,11 @@ public class Player implements Runnable {
                     Integer card = cardsTodo.remove();
 
                     if (!table.removeToken(this.id, slot)) {
-                        if (tokensPlaced < 3) {
+                        if (tokensPlaced < setSize) {
                             if (card != null && table.placeToken(this.id, slot, card)) {
                                 increaseToken();
                             }
-                            if (tokensPlaced == 3) {
+                            if (tokensPlaced == setSize) {
                                 boolean isSetBefore= dealer.IsSetBeforeChanges(this.id);
                                 if (this.dealer.addPlayerRequest(this.id)) {
                                     point();
@@ -226,12 +229,12 @@ public class Player implements Runnable {
     }
     public void decreaseToken()
     {
-        if (tokensPlaced>0)
+        if (tokensPlaced > 0)
             tokensPlaced--;
     }
     public void increaseToken()
     {
-        if(tokensPlaced<3)
+        if(tokensPlaced < setSize)
             tokensPlaced++;
     }
 
@@ -241,6 +244,7 @@ public class Player implements Runnable {
 
     }
 
+    public int GetPlayerTokens(){return tokensPlaced;}
 
 
 

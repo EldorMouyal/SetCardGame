@@ -40,10 +40,8 @@ class TableTest {
     }
 
     private int fillSomeSlots() {
-        slotToCard[1] = 3;
-        slotToCard[2] = 5;
-        cardToSlot[3] = 1;
-        cardToSlot[5] = 2;
+        table.placeCard(13,2);
+        table.placeCard(27,5);
 
         return 2;
     }
@@ -93,6 +91,33 @@ class TableTest {
     void placeCard_AllSlotsAreFilled() throws InterruptedException {
         fillAllSlots();
         placeSomeCardsAndAssert();
+    }
+    @Test
+    void remove_card(){
+        int expetednumofcards = 2;
+        for(int i=0; i<3; i++){
+            table.placeCard(i,i);
+        }
+        table.removeCard(2);
+        assertEquals(expetednumofcards,table.countCards());
+        assertEquals(table.slotToCard[2],null);
+    }
+
+    @Test
+    void TokensTest(){
+        int expected = 2;
+        table.placeCard(5,0);
+        int playerId0 = 0;
+        int playerId1 = 1;
+        table.placeToken(playerId0,0,5);
+        table.placeToken(playerId1,0,5);
+        assertEquals(expected,table.slotToTokens[0].size());
+
+        table.removeToken(playerId0,0);
+        assertEquals(expected-1,table.slotToTokens[0].size());
+
+        table.removeAllTokens();
+        assertEquals(0,table.slotToTokens[0].size());
     }
 
     static class MockUserInterface implements UserInterface {

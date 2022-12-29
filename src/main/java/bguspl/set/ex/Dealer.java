@@ -46,6 +46,7 @@ public class Dealer implements Runnable {
     private  long roundCurrentTime;
     private  final LinkedList<int[]> cardsToRemove;
     private BlockingQueue<Integer> playerQueue;
+    private int setSize;
 
     public Dealer(Env env, Table table, Player[] players) {
         this.env = env;
@@ -54,6 +55,7 @@ public class Dealer implements Runnable {
         deck = IntStream.range(0, env.config.deckSize).boxed().collect(Collectors.toList());
         cardsToRemove = new LinkedList<>();
         playerQueue = new LinkedBlockingQueue<>();
+        setSize = env.config.featureSize;
     }
 
     /**
@@ -127,8 +129,8 @@ public class Dealer implements Runnable {
             if (!cardsToRemove.isEmpty()) {
                 synchronized (table) {//#################################################################################### removed, not neccesary
                     int[] ToRemove = cardsToRemove.removeFirst();//making an array of the first set that need to get removed
-                    int[] slots = new int[3];
-                    for (int i = 0; i < 3; i++) {//removing the set and its tokens
+                    int[] slots = new int[setSize];
+                    for (int i = 0; i < setSize; i++) {//removing the set and its tokens
                         if(table.cardToSlot[ToRemove[i]]!=null){
                         slots[i] = table.cardToSlot[ToRemove[i]];
                         for (Player p : players) {
@@ -175,7 +177,7 @@ public class Dealer implements Runnable {
         // TODO implement
         if(reset){
             roundStartTime = System.currentTimeMillis();
-            reshuffleTime = roundStartTime + env.config.turnTimeoutMillis + 900 ;
+            reshuffleTime = roundStartTime + env.config.turnTimeoutMillis ;
         }
         roundCurrentTime = (reshuffleTime - System.currentTimeMillis());
         if(roundCurrentTime <= 0){
@@ -210,7 +212,7 @@ public class Dealer implements Runnable {
     private synchronized void announceWinners() {
         // TODO implement
         List<Integer> winners= new LinkedList<>();
-        int max=0;
+        int max = 0;
         for(Player p:players)
         {
             if (p.score()>max)
@@ -225,7 +227,7 @@ public class Dealer implements Runnable {
         }
 
         int[] playerIds= new int[winners.size()];
-        int i=0;
+        int i = 0;
         for(int id:winners)
         {
             playerIds[i]=id;
@@ -248,18 +250,21 @@ public class Dealer implements Runnable {
         }
         return CheckPlayerSet(playerQueue.remove());
     }
-    private boolean CheckPlayerSet(int playerId)//this methods checks if a player has a set and calls the appropriate freeze methode
+    private boolean CheckPlayerSet(int playerId)//checks if a player has a set and calls the appropriate freeze method
     {
         int[] PlayerCards= table.GetPlayerCards(playerId);
-        boolean isSetBefore =  env.util.testSet(PlayerCards);
+        //boolean isSetBefore =  env.util.testSet(PlayerCards);
         boolean isSet =  false;
         boolean isOnRemoveList=false;
         synchronized (cardsToRemove){
             synchronized (table){
                 for(int[] c: cardsToRemove) {
                     for(int i=0;i<c.length;i++) {
-                        if(c[i]==PlayerCards[0] || c[i]==PlayerCards[1] || c[i]==PlayerCards[2])
-                            isOnRemoveList = true;
+                        /*if(c[i]==PlayerCards[0] || c[i]==PlayerCards[1] || c[i]==PlayerCards[2])
+                            isOnRemoveList = true;*/
+                        for(int card:PlayerCards){
+                            isOnRemoveList = (isOnRemoveList)|| (c[i] == card);
+                        }
                     }
                 }
 
@@ -286,9 +291,9 @@ public class Dealer implements Runnable {
 
     private void clearNullsFromDeck()//removes all null cards from deck
     {
-        for (int i=0;i<deck.size();i++)
+        for (int i=0; i<deck.size(); i++)
         {
-            if (deck.get(i)==null)
+            if (deck.get(i) == null)
                 deck.remove(i);
         }
     }
@@ -296,7 +301,7 @@ public class Dealer implements Runnable {
     private boolean checkIfTableHasNoSetAndDeckEmpty()
     {
         List<Integer> cards= new LinkedList<>();
-        boolean output=true;
+        boolean output;
         synchronized (table) {
             for(int i=0; i<table.slotToCard.length;i++)
             {

@@ -44,6 +44,7 @@ class PlayerTest {
         // purposely do not find the configuration files (use defaults here).
         Env env = new Env(logger, new Config(logger, (String) null), ui, util);
         player = new Player(env, dealer, table, 0, false);
+        table = new Table(env);
         assertInvariants();
     }
 
@@ -56,7 +57,7 @@ class PlayerTest {
     void point() {
 
         // force table.countCards to return 3
-        when(table.countCards()).thenReturn(3); // this part is just for demonstration
+        //when(table.countCards()).thenReturn(3); // this part is just for demonstration
 
         // calculate the expected score for later
         int expectedScore = player.score() + 1;
@@ -69,5 +70,28 @@ class PlayerTest {
 
         // check that ui.setScore was called with the player's id and the correct score
         verify(ui).setScore(eq(player.id), eq(expectedScore));
+    }
+    @Test
+    void penalty(){
+        int excpectedScore = player.score();
+        player.penalty();
+        assertEquals(excpectedScore,player.score());
+        verify(ui).setScore(eq(player.id),eq(excpectedScore));
+    }
+
+    @Test
+    void TokensTest(){
+        int expectedTokens = 3;
+        player.increaseToken();
+        player.increaseToken();
+        player.increaseToken();
+        player.increaseToken();
+        assertEquals(expectedTokens,player.GetPlayerTokens());
+        expectedTokens--;
+        player.decreaseToken();
+        assertEquals(expectedTokens,player.GetPlayerTokens());
+        expectedTokens = 0;
+        player.removeTokens();
+        assertEquals(expectedTokens,player.GetPlayerTokens());
     }
 }

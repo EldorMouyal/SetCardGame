@@ -27,7 +27,7 @@ public class Table {
      */
     protected final Integer[] cardToSlot; // slot per card (if any)
     protected final List<Integer>[] slotToTokens;
-
+    private int setSize;
     /**
      * Constructor for testing.
      *
@@ -38,6 +38,7 @@ public class Table {
     public Table(Env env, Integer[] slotToCard, Integer[] cardToSlot) {
 
         this.env = env;
+        this.setSize = env.config.featureSize;
         this.slotToCard = slotToCard;
         this.cardToSlot = cardToSlot;
         slotToTokens = new LinkedList[slotToCard.length];
@@ -143,12 +144,12 @@ public class Table {
         synchronized (this) {
             if (slotToCard[slot] != null && card == slotToCard[slot]) {
                 int counter=0;
-                for(int i=0;i<slotToTokens.length&counter<3;i++)
+                for(int i=0; i<slotToTokens.length & counter<setSize; i++)
                 {
                     if (slotToTokens[i].contains(player))
                         counter++;
                 }
-                if (counter<3){
+                if (counter < setSize){
                     placed = true;
                     placeToken(player, slot);}
             }
@@ -167,7 +168,7 @@ public class Table {
     public boolean removeToken(int player, int slot) {
         // TODO implement
         synchronized (this){
-        for (int i=0; i<slotToTokens[slot].size();i++)
+        for (int i=0; i < slotToTokens[slot].size(); i++)
         {
             if (slotToTokens[slot].get(i)==player) {
                 slotToTokens[slot].remove(i);
@@ -181,7 +182,7 @@ public class Table {
     }
     public synchronized int[] GetPlayerCards(int playerId)
     {
-        int[] cards = new int[3];
+        int[] cards = new int[setSize];
         int cardIndex = 0;
         synchronized (slotToTokens){
         List<Integer>[] copyOfSlotToTokens = slotToTokens.clone();

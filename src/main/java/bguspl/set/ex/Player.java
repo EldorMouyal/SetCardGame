@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This class manages the players' threads and data
@@ -57,8 +60,9 @@ public class Player implements Runnable {
     private int score;
     private int tokensPlaced;
 
-    private final Queue<Integer> slotsTodo;
-    private final Queue<Integer> cardsTodo;
+    private final BlockingQueue<Integer> slotsTodo;
+    private final BlockingQueue<Integer> cardsTodo;
+    private final BlockingQueue[] Todo;
     private Random rnd;
     int randomInt;
     private  long freezeTime;//#################################
@@ -83,9 +87,11 @@ public class Player implements Runnable {
         this.human = human;
         this.dealer=dealer;
         this.tokensPlaced = 0;
-        slotsTodo= new LinkedList<>();
-        cardsTodo= new LinkedList<>();
-        rnd = new Random();
+        slotsTodo= new LinkedBlockingQueue<>();
+        cardsTodo= new LinkedBlockingQueue<>();
+        Todo= new LinkedBlockingQueue[2];
+        Todo[0]=slotsTodo;
+        Todo[1]=cardsTodo;
     }
 
     /**
@@ -95,13 +101,15 @@ public class Player implements Runnable {
     public void run() {
         playerThread = Thread.currentThread();
         env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
-        //if (!human) createArtificialIntelligence();
+        if (!human) createArtificialIntelligence();
 
         while (!terminate) {
             // TODO implement main player loop
             try {
-                if (!human) {createArtificialIntelligence();}
+                //if (!human) {createArtificialIntelligence();}
                 if (!slotsTodo.isEmpty()) {
+                    System.out.println(slotsTodo.peek());
+                    if (table.slotToCard[slotsTodo.peek()]!=null&&cardsTodo.peek()!=null&&table.slotToCard[slotsTodo.peek()] == cardsTodo.peek()){
                     Integer slot = slotsTodo.remove();
                     Integer card = cardsTodo.remove();
 
@@ -119,6 +127,11 @@ public class Player implements Runnable {
                         }
                     } else
                         decreaseToken();
+                }
+                    else {
+                        slotsTodo.remove();
+                        cardsTodo.remove();
+                    }
                 }
             }
             catch (NoSuchElementException e) {
@@ -147,14 +160,9 @@ public class Player implements Runnable {
             env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
             while (!terminate) {
                 // TODO implement player key press
-                randomInt = rnd.nextInt(env.config.tableSize);
-                this.keyPressed(randomInt);
-                synchronized (this) {
-                    try {
-                        wait();
-                    } catch (InterruptedException ignored) {
-                    }
-                }
+               //randomInt = rnd.nextInt(env.config.tableSize);
+                //this.keyPressed(randomInt);
+                keyPressed(((int)Math.floor(Math.random() * env.config.tableSize)));
             }
             env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
         }, "computer-" + id);
@@ -176,9 +184,19 @@ public class Player implements Runnable {
      */
     public void keyPressed(int slot) {
         // TODO implement
-        if (!freezeForPenalty&&!freezeForPoint){
-            slotsTodo.add(slot);
-            cardsTodo.add(table.slotToCard[slot]);}
+        synchronized (this) {
+            if (!freezeForPenalty && !freezeForPoint) {
+                synchronized (table){
+                if (table.slotToCard[slot] != null) {
+                    slotsTodo.add(slot);
+                    cardsTodo.add(table.slotToCard[slot]);
+                }
+                table.notifyAll();
+                }
+            }
+            notifyAll();
+
+        }
     }
 
     /**
@@ -223,6 +241,7 @@ public class Player implements Runnable {
     public void removeTokens()
     {
         tokensPlaced=0;
+
     }
 
 

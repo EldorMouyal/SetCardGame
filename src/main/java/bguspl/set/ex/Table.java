@@ -26,7 +26,7 @@ public class Table {
      * Mapping between a card and the slot it is in (null if none).
      */
     protected final Integer[] cardToSlot; // slot per card (if any)
-    protected final List<Integer>[] tokensToSlot;
+    protected final List<Integer>[] slotToTokens;
 
     /**
      * Constructor for testing.
@@ -40,9 +40,9 @@ public class Table {
         this.env = env;
         this.slotToCard = slotToCard;
         this.cardToSlot = cardToSlot;
-        tokensToSlot = new LinkedList[slotToCard.length];
-        for(int i = 0; i< tokensToSlot.length;i++){
-            tokensToSlot[i] = new LinkedList<>();
+        slotToTokens = new LinkedList[slotToCard.length];
+        for(int i = 0; i< slotToTokens.length;i++){
+            slotToTokens[i] = new LinkedList<>();
         }
     }
 
@@ -94,13 +94,13 @@ public class Table {
         try {
             Thread.sleep(env.config.tableDelayMillis);
         } catch (InterruptedException ignored) {}
-
+        synchronized (this){
         cardToSlot[card] = slot;
         slotToCard[slot] = card;
 
         // TODO implement
         env.ui.placeCard(card,slot);
-        synchronized (this){notifyAll();}//############################################################
+        notifyAll();}//############################################################
 
     }
 
@@ -132,7 +132,7 @@ public class Table {
     public void placeToken(int player, int slot) {
         // TODO implement
         if (slotToCard[slot]!= null) {
-            tokensToSlot[slot].add(player);
+            slotToTokens[slot].add(player);
             env.ui.placeToken(player, slot);
         }
     }
@@ -143,9 +143,9 @@ public class Table {
         synchronized (this) {
             if (slotToCard[slot] != null && card == slotToCard[slot]) {
                 int counter=0;
-                for(int i=0;i<tokensToSlot.length&counter<3;i++)
+                for(int i=0;i<slotToTokens.length&counter<3;i++)
                 {
-                    if (tokensToSlot[i].contains(player))
+                    if (slotToTokens[i].contains(player))
                         counter++;
                 }
                 if (counter<3){
@@ -166,13 +166,16 @@ public class Table {
      */
     public boolean removeToken(int player, int slot) {
         // TODO implement
-        for (int i=0; i<tokensToSlot[slot].size();i++)
+        synchronized (this){
+        for (int i=0; i<slotToTokens[slot].size();i++)
         {
-            if (tokensToSlot[slot].get(i)==player) {
-                tokensToSlot[slot].remove(i);
+            if (slotToTokens[slot].get(i)==player) {
+                slotToTokens[slot].remove(i);
                 env.ui.removeToken(player,slot);
                 return true;
             }
+        }
+        notifyAll();
         }
         return false;
     }
@@ -180,21 +183,22 @@ public class Table {
     {
         int[] cards = new int[3];
         int cardIndex = 0;
-        synchronized (tokensToSlot){
-        List<Integer>[] copyOfTokensToSlot = tokensToSlot.clone();
-            for (int i = 0; i < copyOfTokensToSlot.length; i++) {
-                for (int j : copyOfTokensToSlot[i]) {
+        synchronized (slotToTokens){
+        List<Integer>[] copyOfSlotToTokens = slotToTokens.clone();
+            for (int i = 0; i < copyOfSlotToTokens.length; i++) {
+                for (int j : copyOfSlotToTokens[i]) {
                     if (j == playerId)
                         cards[cardIndex++] = slotToCard[i];
                 }
             }
+
         notifyAll();}//############################################################
         return cards;
     }
 
     public void removeAllTokens() {
-        for(int i = 0; i< tokensToSlot.length; i++) {
-            tokensToSlot[i].clear();
+        for(int i = 0; i< slotToTokens.length; i++) {
+            slotToTokens[i].clear();
         }
         env.ui.removeTokens();
     }

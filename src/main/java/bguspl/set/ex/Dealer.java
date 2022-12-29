@@ -90,6 +90,7 @@ public class Dealer implements Runnable {
                 p.updateTimerDisplayForPenalty(false);
                 p.updateTimerDisplayForPoint(false);
             }
+
             removeCardsFromTable();
             placeCardsOnTable();
         }

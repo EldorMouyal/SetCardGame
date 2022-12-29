@@ -1,9 +1,0 @@
-[12:06:49.522] [INFO   ] thread main starting.
-[12:06:49.528] [SEVERE ] cannot read configuration file config.properties trying from resources.
-[12:06:49.530] [SEVERE ] configuration file was loaded from resources directory.
-[12:06:49.945] [INFO   ] thread dealer starting.
-[12:06:49.945] [INFO   ] Thread dealer starting.
-[12:06:49.946] [INFO   ] Thread Thread-0 starting.
-[12:06:54.880] [SEVERE ] exit button pressed
-[12:06:54.880] [SEVERE ] thanks for playing... it was fun!
-[12:06:54.881] [INFO   ] thread main terminated.

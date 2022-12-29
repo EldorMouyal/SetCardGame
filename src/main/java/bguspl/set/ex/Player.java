@@ -106,7 +106,6 @@ public class Player implements Runnable {
         while (!terminate) {
             // TODO implement main player loop
             try {
-                //if (!human) {createArtificialIntelligence();}
                 if (!slotsTodo.isEmpty()) {
                     System.out.println(slotsTodo.peek());
                     if (table.slotToCard[slotsTodo.peek()]!=null&&cardsTodo.peek()!=null&&table.slotToCard[slotsTodo.peek()] == cardsTodo.peek()){
@@ -119,10 +118,12 @@ public class Player implements Runnable {
                                 increaseToken();
                             }
                             if (tokensPlaced == 3) {
+                                boolean isSetBefore= dealer.IsSetBeforeChanges(this.id);
                                 if (this.dealer.addPlayerRequest(this.id)) {
                                     point();
-                                } else
-                                    penalty();
+                                } else{
+                                    if(!isSetBefore)
+                                        penalty();}
                             }
                         }
                     } else
@@ -160,8 +161,7 @@ public class Player implements Runnable {
             env.logger.info("Thread " + Thread.currentThread().getName() + " starting.");
             while (!terminate) {
                 // TODO implement player key press
-               //randomInt = rnd.nextInt(env.config.tableSize);
-                //this.keyPressed(randomInt);
+
                 keyPressed(((int)Math.floor(Math.random() * env.config.tableSize)));
             }
             env.logger.info("Thread " + Thread.currentThread().getName() + " terminated.");
@@ -194,7 +194,7 @@ public class Player implements Runnable {
                 table.notifyAll();
                 }
             }
-            notifyAll();
+           notifyAll();
 
         }
     }
@@ -207,8 +207,8 @@ public class Player implements Runnable {
      */
     public void point() {
         // TODO implement
-        freezeForPoint=true;//###################
-        updateTimerDisplayForPoint(true);//###################
+        freezeForPoint=true;
+        updateTimerDisplayForPoint(true);
         env.ui.setScore(id, ++score);
         removeTokens();
     }
@@ -218,8 +218,8 @@ public class Player implements Runnable {
      */
     public void penalty() {
         // TODO implement
-        freezeForPenalty=true;//#################
-        updateTimerDisplayForPenalty(true);//###################
+        freezeForPenalty=true;
+        updateTimerDisplayForPenalty(true);
         slotsTodo.clear();
         cardsTodo.clear();
     }
@@ -247,29 +247,40 @@ public class Player implements Runnable {
 
 
 
-    public void updateTimerDisplayForPenalty(boolean start) {//######################################
+    public void updateTimerDisplayForPenalty(boolean start) {
         // TODO implement
         if(start){
             freezeTime = System.currentTimeMillis()+env.config.penaltyFreezeMillis;
         }
         freezeCurrentTime = (freezeTime - System.currentTimeMillis());
         if(freezeCurrentTime <= 0){
-           // freezeCurrentTime = 0;
             freezeForPenalty=false;
         }
         env.ui.setFreeze(id, freezeCurrentTime);
     }
 
-    public void updateTimerDisplayForPoint(boolean start) {//####################################333
+    public void updateTimerDisplayForPoint(boolean start) {
         // TODO implement
         if(start){
             freezeTime = System.currentTimeMillis()+env.config.pointFreezeMillis;
         }
         freezeCurrentTime = (freezeTime - System.currentTimeMillis());
         if(freezeCurrentTime <= 0){
-            //freezeCurrentTime = 0;
             freezeForPoint=false;
         }
         env.ui.setFreeze(id, freezeCurrentTime);
+    }
+
+    public void removeSimilarTodo(int slot, int card)
+    {
+        synchronized (Todo)
+        {
+            while (slotsTodo.contains(slot))
+                slotsTodo.remove(slot);
+            while (cardsTodo.contains(card))
+                cardsTodo.remove(cardsTodo);
+
+            Todo.notifyAll();
+        }
     }
 }

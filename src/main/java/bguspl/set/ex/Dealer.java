@@ -124,7 +124,7 @@ public class Dealer implements Runnable {
     private void removeCardsFromTable() {
         // TODO implement
             if (!cardsToRemove.isEmpty()) {
-                synchronized (table) {//avoiding letting a player to place tokens while no cards on table
+               // synchronized (table) {//#################################################################################### removed, not neccesary
                     int[] ToRemove = cardsToRemove.removeFirst();//making an array of the first set that need to get removed
                     int[] slots = new int[3];
                     for (int i = 0; i < 3; i++) {//removing the set and its tokens
@@ -136,7 +136,7 @@ public class Dealer implements Runnable {
                             p.decreaseToken();
                         }}
                     }
-                }
+                //}
                 updateTimerDisplay(true);
             }
         }
@@ -265,15 +265,20 @@ public class Dealer implements Runnable {
             }
             if (!isOnRemoveList){
                isSet= env.util.testSet(PlayerCards);
-                if (isSet)
+                if (isSet) {
                     cardsToRemove.add(PlayerCards);
+                }
             }
         }
 
         synchronized (this){notifyAll();}
         return isSet;
     }
-
+    public boolean IsSetBeforeChanges(int playerId)
+    {
+        int[] PlayerCards= table.GetPlayerCards(playerId);
+        return env.util.testSet(PlayerCards);
+    }
 
 
 
